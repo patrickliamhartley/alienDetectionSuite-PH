@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '../config/apiKey';
+import SpaceShipIcon from './SpaceShipIcon';
 
 interface AlienShip {
   id: number;
   latitude: number;
   longitude: number;
+  angle: number;
   name: string;
   attributes: {
     speed: number;
@@ -15,6 +18,10 @@ interface AlienShip {
   };
 }
 
+let shipNumber = 10;
+let scaleConstantBig = 10;
+let scaleConstantSmall = 1;
+
 const LocalAlienDetection: React.FC = () => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +29,25 @@ const LocalAlienDetection: React.FC = () => {
   const [alienShips, setAlienShips] = useState<AlienShip[]>([]);
   const [selectedShip, setSelectedShip] = useState<AlienShip | null>(null);
 
-  let interalShipVariance = 0.3;
-  let numberOfShips = 10;
+  const generateAlienShips = React.useCallback((userLat: number, userLng: number) => {
+    const ships: AlienShip[] = [];
+    for (let i = 0; i < shipNumber; i++) {
+      const ship: AlienShip = {
+        id: i,
+        latitude: userLat + (Math.random() - 0.5) * scaleConstantSmall,
+        longitude: userLng + (Math.random() - 0.5) * scaleConstantSmall,
+        angle: Math.random() * 2 * Math.PI,
+        name: `Alien Ship ${i + 1}`,
+        attributes: {
+          speed: Math.floor(Math.random() * 100),
+          size: (Math.random()*scaleConstantBig + 20).toString(),
+          color: ['Red', 'Blue', 'Green'][Math.floor(Math.random() * 3)],
+        },
+      };
+      ships.push(ship);
+    }
+    setAlienShips(ships);
+  }, []);
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -49,26 +73,34 @@ const LocalAlienDetection: React.FC = () => {
       setLoading(false);
       generateAlienShips(37.235, -115.8111);
     }
-  }, []);
+  }, [generateAlienShips]);
 
-  const generateAlienShips = (userLat: number, userLng: number) => {
-    const ships: AlienShip[] = [];
-    for (let i = 0; i < numberOfShips; i++) {
-      const ship: AlienShip = {
-        id: i,
-        latitude: userLat + (Math.random() - 0.5) * interalShipVariance,
-        longitude: userLng + (Math.random() - 0.5) * interalShipVariance,
-        name: `Alien Ship ${i + 1}`,
-        attributes: {
-          speed: Math.floor(Math.random() * 100),
-          size: ['Small', 'Medium', 'Large'][Math.floor(Math.random() * 3)],
-          color: ['Red', 'Blue', 'Green'][Math.floor(Math.random() * 3)],
-        },
-      };
-      ships.push(ship);
-    }
-    setAlienShips(ships);
-  };
+  // Update ship positions every half second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAlienShips((prevShips) =>
+        prevShips.map((ship) => {
+          // Generate a random angle between 0 and 2π
+          let plusOrMinus = Math.random() > 0.5 ? 1 : -1;
+          const newAngle = (ship.angle + (Math.random() * Math.PI * .1) * plusOrMinus);
+          // Set a fixed distance for movement (in degrees)
+          const distance = 0.0002;
+          // Calculate new position using trigonometry
+          const newLat = ship.latitude + distance * ship.attributes.speed * Math.cos(newAngle);
+          const newLng = ship.longitude + distance * ship.attributes.speed * Math.sin(newAngle);
+          return {
+            ...ship,
+            angle: newAngle,
+            latitude: newLat,
+            longitude: newLng,
+          };
+        })
+      );
+    }, 500); // Update every 500ms (half second)
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array means this effect runs once on mount
 
   const handleShipClick = (ship: AlienShip) => {
     setSelectedShip(ship);
@@ -78,16 +110,7 @@ const LocalAlienDetection: React.FC = () => {
     setSelectedShip(null);
   };
 
-  const mapContainerStyle = {
-    width: '100%',
-    height: '450px',
-  };
-
   const center = location ? { lat: location.latitude, lng: location.longitude } : { lat: 37.235, lng: -115.8111 };
-
-  const alienShipIcon = (color: string) => ({
-    url: 'https://pic.onlinewebfonts.com/thumbnails/icons_10168.svg'
-  });
 
   return (
     <Box sx={{ p: 3 }}>
@@ -109,18 +132,24 @@ const LocalAlienDetection: React.FC = () => {
           <Typography variant="body1" gutterBottom>
             Your current location: {location.latitude}, {location.longitude}
           </Typography>
-          <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
-            <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
+          <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+            <Map 
+              defaultCenter={center} 
+              defaultZoom={10} 
+              mapId="739af084373f96fe"
+              style={{width: '100vw', height: '100vh'}}
+            >
               {alienShips.map((ship) => (
-                <Marker
+                <AdvancedMarker
                   key={ship.id}
                   position={{ lat: ship.latitude, lng: ship.longitude }}
-                  icon={alienShipIcon(ship.attributes.color)}
                   onClick={() => handleShipClick(ship)}
-                />
+                >
+                <SpaceShipIcon color={ship.attributes.color} size={ship.attributes.size} />
+                </AdvancedMarker>
               ))}
-            </GoogleMap>
-          </LoadScript>
+            </Map>
+          </APIProvider>
         </Box>
       )}
       <Dialog open={!!selectedShip} onClose={handleCloseDialog}>
