@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { NeoDataViewer } from './components/NeoDataViewer';
+import NeoDataViewer from './components/NeoDataViewer';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
 const theme = createTheme({
