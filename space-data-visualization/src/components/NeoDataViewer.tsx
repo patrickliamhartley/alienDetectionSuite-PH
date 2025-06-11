@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Box, Paper, Typography, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography, CircularProgress, Alert } from '@mui/material';
 import { useApi } from '../hooks/useApi';
+import { API_KEY } from '../config/api';
 
 interface NeoData {
   id: string;
@@ -31,12 +32,13 @@ interface NeoData {
 export const NeoDataViewer: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const { data, loading, error, fetchData } = useApi<NeoData>();
+  const [usingDemoKey, setUsingDemoKey] = useState(false);
 
   const handleDateChange = async (date: Date | null) => {
     if (date) {
       setSelectedDate(date);
-      // Using the DEMO_KEY for testing
-      await fetchData('/neo/rest/v1/neo/3542519?api_key=DEMO_KEY');
+      await fetchData(`/neo/rest/v1/neo/3542519?api_key=${API_KEY}`);
+      setUsingDemoKey(false);
     }
   };
 
