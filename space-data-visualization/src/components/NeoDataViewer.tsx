@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Paper, Typography, CircularProgress, Alert, Button } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -23,27 +23,26 @@ const NeoDataViewer: React.FC = () => {
     setEndDate(date);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!startDate || !endDate) return;
+  const handleSearch = async () => {
+    if (!startDate || !endDate) {
+      setError('Please select both start and end dates.');
+      return;
+    }
 
-      setLoading(true);
-      setError(null);
-      try {
-        const formattedStartDate = format(startDate, 'yyyy-MM-dd');
-        const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-        const result = await fetchNeoData(formattedStartDate, formattedEndDate, API_KEY);
-        setData(result);
-      } catch (err) {
-        setError('Failed to fetch NEO data. Please try again.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [startDate, endDate]);
+    setLoading(true);
+    setError(null);
+    try {
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      const result = await fetchNeoData(formattedStartDate, formattedEndDate, API_KEY);
+      setData(result);
+    } catch (err) {
+      setError('Failed to fetch NEO data. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -52,7 +51,7 @@ const NeoDataViewer: React.FC = () => {
           Select Date Range
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <DatePicker
               label="Start Date"
               value={startDate}
@@ -64,6 +63,9 @@ const NeoDataViewer: React.FC = () => {
               onChange={handleEndDateChange}
             />
           </Box>
+          <Button variant="contained" color="primary" onClick={handleSearch}>
+            Search
+          </Button>
         </LocalizationProvider>
       </Paper>
 
