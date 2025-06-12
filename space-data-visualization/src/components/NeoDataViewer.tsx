@@ -6,7 +6,6 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import NeoVisualization from './NeoVisualization';
 import { fetchNeoData } from '../config/api';
-import { API_KEY } from '../config/api';
 import TerminalLoading from './TerminalLoading';
 
 const NeoDataViewer: React.FC = () => {
@@ -35,10 +34,10 @@ const NeoDataViewer: React.FC = () => {
     try {
       const formattedStartDate = format(startDate, 'yyyy-MM-dd');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-      const result = await fetchNeoData(formattedStartDate, formattedEndDate, API_KEY);
+      const result = await fetchNeoData(formattedStartDate, formattedEndDate);
       setData(result);
     } catch (err) {
-      setError('Failed to fetch NEO data. Currently only supports a 7 day range.');
+      setError('Failed to fetch NEO data. Please check your API key configuration.');
       console.error(err);
     } finally {
       setLoading(false);
