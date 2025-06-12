@@ -1,9 +1,25 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Box, Typography, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { Box, Typography, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '../config/apiKey';
 import SpaceShipIcon from './SpaceShipIcon';
+import TerminalLoading from './TerminalLoading';
+
+type ShipColor = 'OrangeRed' | 'DeepPink' | 'Yellow';
+
+const generateAlienName = () => {
+  const prefixes = ['Zor', 'Xyl', 'Qua', 'Vex', 'Nyx', 'Kry', 'Zyl', 'Vex', 'Nex', 'Xen'];
+  const middles = ['th', 'ph', 'x', 'z', 'q', 'k', 'v', 'n', 'm', 'l'];
+  const suffixes = ['or', 'ix', 'ax', 'ex', 'ox', 'ux', 'yx', 'zx', 'qx', 'nx'];
+  const numbers = Math.floor(Math.random() * 999);
+  
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const middle = middles[Math.floor(Math.random() * middles.length)];
+  const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+  
+  return `${prefix}${middle}${suffix}-${numbers}`;
+};
 
 interface AlienShip {
   id: number;
@@ -13,14 +29,19 @@ interface AlienShip {
   name: string;
   attributes: {
     speed: number;
-    size: string;
-    color: string;
+    size: number;
+    color: ShipColor;
   };
 }
 
 let shipNumber = 10;
-let scaleConstantBig = 10;
+let scaleConstantBig = 20;
 let scaleConstantSmall = 1;
+let dangerLevels: Record<ShipColor, string> = { 
+  'OrangeRed': 'Low', 
+  'DeepPink': 'Medium', 
+  'Yellow': 'High'
+};
 
 const LocalAlienDetection: React.FC = () => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -37,11 +58,11 @@ const LocalAlienDetection: React.FC = () => {
         latitude: userLat + (Math.random() - 0.5) * scaleConstantSmall,
         longitude: userLng + (Math.random() - 0.5) * scaleConstantSmall,
         angle: Math.random() * 2 * Math.PI,
-        name: `Alien Ship ${i + 1}`,
+        name: generateAlienName(),
         attributes: {
           speed: Math.floor(Math.random() * 100),
-          size: (Math.random()*scaleConstantBig + 20).toString(),
-          color: ['Red', 'Blue', 'Green'][Math.floor(Math.random() * 3)],
+          size: Math.random() * scaleConstantBig + 20,
+          color: ['OrangeRed', 'DeepPink', 'Yellow'][Math.floor(Math.random() * 3)] as ShipColor,
         },
       };
       ships.push(ship);
@@ -116,12 +137,9 @@ const LocalAlienDetection: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
         Local Alien Detection
+        <p>Locating {alienShips.length} alien ships in your area, click on a ship to learn more about it.</p>
       </Typography>
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
+      {loading && <TerminalLoading />}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -155,11 +173,23 @@ const LocalAlienDetection: React.FC = () => {
       <Dialog open={!!selectedShip} onClose={handleCloseDialog}>
         {selectedShip && (
           <>
-            <DialogTitle>{selectedShip.name}</DialogTitle>
+            <DialogTitle>Ship Name: {selectedShip.name}</DialogTitle>
             <DialogContent>
-              <Typography>Speed: {selectedShip.attributes.speed}</Typography>
-              <Typography>Size: {selectedShip.attributes.size}</Typography>
+              <Typography variant="h6" sx={{ color: 'var(--terminal-green)', mb: 2 }}>Ship Specifications</Typography>
+              <Typography>Speed: {selectedShip.attributes.speed} Km/s</Typography>
+              <Typography>Size: {Math.floor(selectedShip.attributes.size)} meters</Typography>
               <Typography>Color: {selectedShip.attributes.color}</Typography>
+              
+              <Typography variant="h6" sx={{ color: 'var(--terminal-green)', mt: 3, mb: 2 }}>Location Data</Typography>
+              <Typography>Latitude: {selectedShip.latitude.toFixed(6)}°</Typography>
+              <Typography>Longitude: {selectedShip.longitude.toFixed(6)}°</Typography>
+              <Typography>Heading: {((selectedShip.angle * 180 / Math.PI) % 360).toFixed(1)}°</Typography>
+              
+              <Typography variant="h6" sx={{ color: 'var(--terminal-green)', mt: 3, mb: 2 }}>Threat Assessment</Typography>
+              <Typography>Status: {selectedShip.attributes.speed > 50 ? 'High Velocity' : 'Normal Speed'}</Typography>
+              <Typography>Size Classification: {selectedShip.attributes.size > 30 ? 'Large Vessel' : 'Standard Size'}</Typography>
+              <Typography>Risk Level: {selectedShip.attributes.color === 'Yellow' ? '⚠️ High Alert' : 
+                selectedShip.attributes.color === 'DeepPink' ? '⚠️ Caution' : '✓ Low Risk'}</Typography>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog}>Close</Button>

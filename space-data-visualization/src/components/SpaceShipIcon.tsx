@@ -2,7 +2,7 @@ import React from 'react';
 
 interface SpaceShipIconProps {
   color: string;
-  size: string;
+  size: number;
 }
 
 const sizeBuffer = "5";
@@ -16,8 +16,16 @@ const SpaceShipIcon: React.FC<SpaceShipIconProps> = ({ color, size }) => (
     xmlnsXlink="http://www.w3.org/1999/xlink" 
     viewBox="0 0 575.447 575.447" 
     xmlSpace="preserve"
-    width={size + sizeBuffer}
-    height={size + sizeBuffer}
+    width={size + 5}
+    height={size + 5}
+    stroke="Chartreuse"
+    strokeWidth="20"
+    strokeOpacity="1"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeMiterlimit="10"
+    strokeDasharray="0"
+    strokeDashoffset="0"
     style={{ transform: 'translate(-50%, -50%)' }}
   >
     <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>

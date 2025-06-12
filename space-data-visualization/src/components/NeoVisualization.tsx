@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 interface NeoData {
   id: string;
@@ -21,6 +21,7 @@ interface NeoVisualizationProps {
 
 const NeoVisualization: React.FC<NeoVisualizationProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [selectedNeo, setSelectedNeo] = useState<NeoData | null>(null);
 
   useEffect(() => {
     if (!data || !svgRef.current) return;
@@ -89,17 +90,6 @@ const NeoVisualization: React.FC<NeoVisualizationProps> = ({ data }) => {
       const y = centerY + distance * Math.sin(angle);
       const size = sizeScale(d.estimated_diameter.kilometers.estimated_diameter_max);
 
-      // Add orbit path
-      d3.select(this)
-        .append('circle')
-        .attr('cx', centerX)
-        .attr('cy', centerY)
-        .attr('r', distance)
-        .attr('fill', 'none')
-        .attr('stroke', '#333333')
-        .attr('stroke-width', 0.5)
-        .attr('opacity', 0.3);
-
       // Add asteroid
       d3.select(this)
         .append('circle')
@@ -109,6 +99,8 @@ const NeoVisualization: React.FC<NeoVisualizationProps> = ({ data }) => {
         .attr('fill', d.is_potentially_hazardous_asteroid ? '#ff4444' : '#cccccc')
         .attr('stroke', '#ffffff')
         .attr('stroke-width', 0.5)
+        .style('cursor', 'pointer')
+        .on('click', () => setSelectedNeo(d))
         .append('title')
         .text(`${d.name}\nDiameter: ${d.estimated_diameter.kilometers.estimated_diameter_max.toFixed(2)} km\nMagnitude: ${d.absolute_magnitude_h}`);
 
@@ -116,7 +108,7 @@ const NeoVisualization: React.FC<NeoVisualizationProps> = ({ data }) => {
       const orbit = d3.select(this);
       const animate = () => {
         orbit.transition()
-          .duration(20000)
+          .duration(60000)
           .ease(d3.easeLinear)
           .attrTween('transform', () => {
             return (t: number) => {
@@ -167,11 +159,63 @@ const NeoVisualization: React.FC<NeoVisualizationProps> = ({ data }) => {
   return (
     <Paper sx={{ p: 2, mt: 2, bgcolor: '#000000' }}>
       <Typography variant="h6" gutterBottom sx={{ color: '#ffffff' }}>
-        Solar System Visualization
+        Motherships Detected within Date Range
       </Typography>
       <Box sx={{ overflowX: 'auto' }}>
         <svg ref={svgRef}></svg>
       </Box>
+
+      <Dialog 
+        open={!!selectedNeo} 
+        onClose={() => setSelectedNeo(null)}
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            border: '1px solid var(--terminal-green)',
+            boxShadow: '0 0 10px var(--terminal-glow)'
+          }
+        }}
+      >
+        {selectedNeo && (
+          <>
+            <DialogTitle sx={{ color: 'var(--terminal-green)', fontFamily: 'Courier New, monospace' }}>
+              MOTHERSHIP IDENTIFICATION
+            </DialogTitle>
+            <DialogContent>
+              <Typography sx={{ color: 'var(--terminal-green)', fontFamily: 'Courier New, monospace', mb: 2 }}>
+                Designation: {selectedNeo.name}
+              </Typography>
+              <Typography sx={{ color: 'var(--terminal-green)', fontFamily: 'Courier New, monospace', mb: 2 }}>
+                Size Range: {selectedNeo.estimated_diameter.kilometers.estimated_diameter_min.toFixed(2)} - {selectedNeo.estimated_diameter.kilometers.estimated_diameter_max.toFixed(2)} km
+              </Typography>
+              <Typography sx={{ color: 'var(--terminal-green)', fontFamily: 'Courier New, monospace', mb: 2 }}>
+                Magnitude: {selectedNeo.absolute_magnitude_h}
+              </Typography>
+              <Typography sx={{ 
+                color: selectedNeo.is_potentially_hazardous_asteroid ? '#ff4444' : 'var(--terminal-green)',
+                fontFamily: 'Courier New, monospace',
+                mb: 2
+              }}>
+                Threat Level: {selectedNeo.is_potentially_hazardous_asteroid ? '⚠️ HIGH' : '✓ LOW'}
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button 
+                onClick={() => setSelectedNeo(null)}
+                sx={{
+                  color: 'var(--terminal-green)',
+                  fontFamily: 'Courier New, monospace',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)'
+                  }
+                }}
+              >
+                CLOSE
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Paper>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, CircularProgress, Alert, Button } from '@mui/material';
+import { Box, Paper, Typography, Alert, Button } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import NeoVisualization from './NeoVisualization';
 import { fetchNeoData } from '../config/api';
 import { API_KEY } from '../config/api';
+import TerminalLoading from './TerminalLoading';
 
 const NeoDataViewer: React.FC = () => {
   const [data, setData] = useState<any>(null);
@@ -37,7 +38,7 @@ const NeoDataViewer: React.FC = () => {
       const result = await fetchNeoData(formattedStartDate, formattedEndDate, API_KEY);
       setData(result);
     } catch (err) {
-      setError('Failed to fetch NEO data. Please try again.');
+      setError('Failed to fetch NEO data. Currently only supports a 7 day range.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -46,9 +47,35 @@ const NeoDataViewer: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          Select Date Range
+      <Paper 
+        sx={{ 
+          p: 2, 
+          mb: 2, 
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          border: '1px solid var(--terminal-green)',
+          boxShadow: '0 0 10px var(--terminal-glow)'
+        }}
+      >
+        <Typography 
+          variant="h6" 
+          gutterBottom 
+          sx={{ 
+            color: 'var(--terminal-green)',
+            fontFamily: 'Courier New, monospace',
+            textShadow: '0 0 5px var(--terminal-glow)'
+          }}
+        >
+          MOTHERSHIP TRACKING SYSTEM
+        </Typography>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: 'var(--terminal-green)',
+            mb: 2,
+            fontFamily: 'Courier New, monospace'
+          }}
+        >
+          Select date range to analyze mothership movement patterns
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
@@ -56,27 +83,65 @@ const NeoDataViewer: React.FC = () => {
               label="Start Date"
               value={startDate}
               onChange={handleStartDateChange}
+              sx={{
+                '& .MuiInputBase-root': {
+                  color: 'var(--terminal-green)',
+                  fontFamily: 'Courier New, monospace'
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'var(--terminal-green)'
+                }
+              }}
             />
             <DatePicker
               label="End Date"
               value={endDate}
               onChange={handleEndDateChange}
+              sx={{
+                '& .MuiInputBase-root': {
+                  color: 'var(--terminal-green)',
+                  fontFamily: 'Courier New, monospace'
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'var(--terminal-green)'
+                }
+              }}
             />
           </Box>
-          <Button variant="contained" color="primary" onClick={handleSearch}>
-            Search
+          <Button 
+            variant="contained" 
+            onClick={handleSearch}
+            sx={{
+              backgroundColor: 'transparent',
+              border: '1px solid var(--terminal-green)',
+              color: 'var(--terminal-green)',
+              fontFamily: 'Courier New, monospace',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                boxShadow: '0 0 10px var(--terminal-glow)'
+              }
+            }}
+          >
+            INITIALIZE TRACKING
           </Button>
         </LocalizationProvider>
       </Paper>
 
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
+      {loading && <TerminalLoading />}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: 'var(--terminal-green)',
+            border: '1px solid var(--terminal-green)',
+            '& .MuiAlert-icon': {
+              color: 'var(--terminal-green)'
+            }
+          }}
+        >
           {error}
         </Alert>
       )}

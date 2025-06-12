@@ -1,0 +1,84 @@
+:root {
+  --terminal-green: #00ff00;
+  --terminal-glow: 0 0 10px #00ff00;
+  --terminal-bg: #000000;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px #00ff00,
+                 0 0 20px #00ff00,
+                 0 0 30px #00ff00;
+  }
+  to {
+    text-shadow: 0 0 20px #00ff00,
+                 0 0 30px #00ff00,
+                 0 0 40px #00ff00;
+  }
+}
+
+body {
+  background-color: var(--terminal-bg);
+  color: var(--terminal-green);
+  font-family: 'Courier New', monospace;
+  text-shadow: var(--terminal-glow);
+}
+
+.MuiDialog-paper {
+  background-color: var(--terminal-bg) !important;
+  border: 1px solid var(--terminal-green) !important;
+  box-shadow: 0 0 20px var(--terminal-green) !important;
+}
+
+.MuiDialogTitle-root {
+  color: var(--terminal-green) !important;
+  text-shadow: var(--terminal-glow) !important;
+  border-bottom: 1px solid var(--terminal-green) !important;
+}
+
+.MuiTypography-root {
+  color: var(--terminal-green) !important;
+  text-shadow: var(--terminal-glow) !important;
+}
+
+.MuiButton-root {
+  color: var(--terminal-green) !important;
+  border: 1px solid var(--terminal-green) !important;
+  text-shadow: var(--terminal-glow) !important;
+}
+
+.MuiButton-root:hover {
+  background-color: rgba(0, 255, 0, 0.1) !important;
+  box-shadow: var(--terminal-glow) !important;
+}
+
+.MuiAlert-root {
+  background-color: var(--terminal-bg) !important;
+  color: var(--terminal-green) !important;
+  border: 1px solid var(--terminal-green) !important;
+  text-shadow: var(--terminal-glow) !important;
+}
+
+/* Add a subtle scanline effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1000;
+} 
