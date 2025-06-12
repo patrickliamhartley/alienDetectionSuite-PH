@@ -36,11 +36,6 @@ interface AlienShip {
 
 let scaleConstantBig = 20;
 let scaleConstantSmall = 1;
-let dangerLevels: Record<ShipColor, string> = { 
-  'OrangeRed': 'Low', 
-  'DeepPink': 'Medium', 
-  'Yellow': 'High'
-};
 let shipNumber = 10;
 
 const LocalAlienDetection: React.FC = () => {
