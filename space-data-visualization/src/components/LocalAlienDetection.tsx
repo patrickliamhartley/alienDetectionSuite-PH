@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Box, Typography, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '../config/apiKey';
