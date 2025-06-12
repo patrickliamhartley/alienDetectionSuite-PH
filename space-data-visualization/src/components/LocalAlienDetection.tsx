@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Box, Typography, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '../config/apiKey';
 import SpaceShipIcon from './SpaceShipIcon';
 import TerminalLoading from './TerminalLoading';
@@ -41,6 +41,7 @@ let dangerLevels: Record<ShipColor, string> = {
   'DeepPink': 'Medium', 
   'Yellow': 'High'
 };
+let shipNumber = 10;
 
 const LocalAlienDetection: React.FC = () => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -48,7 +49,6 @@ const LocalAlienDetection: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [alienShips, setAlienShips] = useState<AlienShip[]>([]);
   const [selectedShip, setSelectedShip] = useState<AlienShip | null>(null);
-  const [shipNumber, setShipNumber] = useState<number>(10);
 
   const generateAlienShips = React.useCallback((userLat: number, userLng: number) => {
     const ships: AlienShip[] = [];
