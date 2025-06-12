@@ -37,7 +37,7 @@ const NeoDataViewer: React.FC = () => {
       const result = await fetchNeoData(formattedStartDate, formattedEndDate);
       setData(result);
     } catch (err) {
-      setError('Failed to fetch NEO data. Please check your API key configuration.');
+      setError('Failed to fetch NEO data. Currently only supports a 7 day range.');
       console.error(err);
     } finally {
       setLoading(false);
