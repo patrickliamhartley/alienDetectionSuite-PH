@@ -34,7 +34,6 @@ interface AlienShip {
   };
 }
 
-let shipNumber = 10;
 let scaleConstantBig = 20;
 let scaleConstantSmall = 1;
 let dangerLevels: Record<ShipColor, string> = { 
@@ -49,6 +48,7 @@ const LocalAlienDetection: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [alienShips, setAlienShips] = useState<AlienShip[]>([]);
   const [selectedShip, setSelectedShip] = useState<AlienShip | null>(null);
+  const [shipNumber, setShipNumber] = useState<number>(10);
 
   const generateAlienShips = React.useCallback((userLat: number, userLng: number) => {
     const ships: AlienShip[] = [];
@@ -137,7 +137,7 @@ const LocalAlienDetection: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
         Local Alien Detection
-        <p>Locating {alienShips.length} alien ships in your area, click on a ship to learn more about it.</p>
+        <p>Locating {shipNumber} alien ships in your area, click on a ship to learn more about it.</p>
       </Typography>
       {loading && <TerminalLoading />}
       {error && (
@@ -155,7 +155,7 @@ const LocalAlienDetection: React.FC = () => {
               defaultCenter={center} 
               defaultZoom={10} 
               mapId="739af084373f96fe"
-              style={{width: '100vw', height: '100vh'}}
+              style={{width: '75vw', height: '75vh'}}
             >
               {alienShips.map((ship) => (
                 <AdvancedMarker

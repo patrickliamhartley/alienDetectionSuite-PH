@@ -159,10 +159,10 @@ const NeoVisualization: React.FC<NeoVisualizationProps> = ({ data }) => {
   return (
     <Paper sx={{ p: 2, mt: 2, bgcolor: '#000000' }}>
       <Typography variant="h6" gutterBottom sx={{ color: '#ffffff' }}>
-        Motherships Detected within Date Range
+        Motherships Detected surrounding Earth within Date Range
       </Typography>
       <Box sx={{ overflowX: 'auto' }}>
-        <svg ref={svgRef}></svg>
+        <svg ref={svgRef} style={{width: '100%', height: '100%'}}></svg>
       </Box>
 
       <Dialog 
