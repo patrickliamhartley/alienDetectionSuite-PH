@@ -19,8 +19,6 @@
 .env.test.local
 .env.production.local
 
-# API keys and sensitive data
-src/config/apiKey.ts
 
 npm-debug.log*
 yarn-debug.log*
