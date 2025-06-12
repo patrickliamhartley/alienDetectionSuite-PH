@@ -16,8 +16,8 @@ const SpaceShipIcon: React.FC<SpaceShipIconProps> = ({ color, size }) => (
     xmlnsXlink="http://www.w3.org/1999/xlink" 
     viewBox="0 0 575.447 575.447" 
     xmlSpace="preserve"
-    width={size + 5}
-    height={size + 5}
+    width={size + sizeBuffer}
+    height={size + sizeBuffer}
     stroke="Chartreuse"
     strokeWidth="20"
     strokeOpacity="1"
